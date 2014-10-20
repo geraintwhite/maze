@@ -1,4 +1,5 @@
 from colours import *
+from random import shuffle, randrange
 
 
 class Maze():
@@ -20,7 +21,34 @@ class Maze():
             return f.read().splitlines()
 
     def gen_maze(self):
-        pass
+        '''generates a random maze'''
+
+        width, height = 10, 10
+        maze = []
+        visited = []
+        for y in range(2 * height + 1):
+            row = list([self.wall, ' '][y % 2].join([self.wall] * (width + 1)))
+            maze.append(row)
+
+        def walk(x, y):
+            '''traverses maze creating paths'''
+
+            visited.append((x, y))
+            d = [(-2,0),(0,-2),(0,2),(2,0)]
+            shuffle(d)
+            for delta in d:
+                new_x, new_y = tuple(map(sum, zip((x, y), delta)))
+                if (-1 < new_y < len(maze) and -1 < new_x < len(maze[0])
+                    and (new_x, new_y) not in visited):
+
+                    maze[int((new_y + y)/2)][int((new_x + x)/2)] = ' '
+                    walk(new_x, new_y)
+
+        start = (2 * randrange(1, width+1)-1, 2 * randrange(1, height+1)-1)
+        maze[start[1]][start[0]] = self.start
+        walk(*start)
+
+        return maze
 
     def solve(self):
         self.route = self.explore(self.find_char(self.start)[0])
@@ -76,8 +104,7 @@ class Maze():
 
 if __name__ == '__main__':
     maze = Maze(filename='maze')
-    print(maze)
     maze.solve()
     print(maze)
-    maze.reset()
+    maze = Maze()
     print(maze)
