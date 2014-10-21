@@ -39,8 +39,8 @@ class Maze():
         def walk(x, y):
             '''traverses maze creating paths'''
 
+            end = True
             visited.append((x, y))
-            distances[calc_dist(start, (x, y))] = (x, y)
             d = [(-2,0),(0,-2),(0,2),(2,0)]
             shuffle(d)
             for delta in d:
@@ -50,6 +50,8 @@ class Maze():
 
                     maze[int((new_y + y)/2)][int((new_x + x)/2)] = ' '
                     walk(new_x, new_y)
+                    end = False
+            if end: distances[calc_dist(start, (x, y))] = (x, y)
 
         start = (2 * randrange(1, width+1)-1, 2 * randrange(1, height+1)-1)
         maze[start[1]][start[0]] = self.start
