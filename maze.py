@@ -1,13 +1,14 @@
 from colours import *
 from random import shuffle, randrange
+from math import sqrt
 
 
 class Maze():
-    def __init__(self, filename=None, maze=None, wall='#', start='$', end='%', path='.'):
+    def __init__(self, filename=None, maze=None, wall='#', start='$', end='%', path='.', width=20, height=20):
         '''load maze into object (or generate one if none given)'''
 
         self.wall, self.start, self.end, self.path = wall, start, end, path
-        self.maze = self.read_maze(filename) if filename else maze if maze else self.gen_maze()
+        self.maze = self.read_maze(filename) if filename else maze if maze else self.gen_maze(width, height)
         self.route = []
         self.colours = {
             self.wall: colorStr(self.wall, bg=WHITE, style=CLEAR),
@@ -20,20 +21,26 @@ class Maze():
         with open(filename) as f:
             return f.read().splitlines()
 
-    def gen_maze(self):
+    def gen_maze(self, width, height):
         '''generates a random maze'''
 
-        width, height = 10, 10
         maze = []
         visited = []
+        distances = {}
         for y in range(2 * height + 1):
             row = list([self.wall, ' '][y % 2].join([self.wall] * (width + 1)))
             maze.append(row)
+
+        def calc_dist(p1, p2):
+            '''calculate distance between two points'''
+
+            return sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2)
 
         def walk(x, y):
             '''traverses maze creating paths'''
 
             visited.append((x, y))
+            distances[calc_dist(start, (x, y))] = (x, y)
             d = [(-2,0),(0,-2),(0,2),(2,0)]
             shuffle(d)
             for delta in d:
@@ -47,6 +54,9 @@ class Maze():
         start = (2 * randrange(1, width+1)-1, 2 * randrange(1, height+1)-1)
         maze[start[1]][start[0]] = self.start
         walk(*start)
+
+        end = distances[max(distances.keys())]
+        maze[end[1]][end[0]] = self.end
 
         return maze
 
@@ -103,8 +113,9 @@ class Maze():
 
 
 if __name__ == '__main__':
-    maze = Maze(filename='maze')
-    maze.solve()
-    print(maze)
-    maze = Maze()
-    print(maze)
+    # maze = Maze(filename='maze')
+    # maze.solve()
+    # print(maze)
+    maze2 = Maze()
+    maze2.solve()
+    print(maze2)
