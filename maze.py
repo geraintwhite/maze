@@ -63,13 +63,13 @@ class Maze():
         return maze
 
     def solve(self):
-        self.route = self.explore(self.find_char(self.start)[0])
+        self.route = self.explore(self.find_char(self.start)[0], [])
         return self.route
 
     def reset(self):
         self.route = []
 
-    def explore(self, pos, visited=[]):
+    def explore(self, pos, visited):
         '''visit each of the free spots around pos in the maze'''
 
         visited.append(pos)
